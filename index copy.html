@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>VoxPrivacy</title>
+  <script src="./static/tailwind.js"></script>
+  <script src="./static/vue.global.js"></script>
+  <script src="./static/flowbite.min.js"></script>
+
+  <style type="text/tailwindcss">
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    @layer base {
+      a[href^="http"] {
+        @apply text-blue-500;
+      }
+
+      a:hover {
+        @apply text-blue-700 underline;
+      }
+
+      h1 {
+        @apply mb-6 text-3xl font-bold text-gray-900 text-center;
+      }
+
+      h2 {
+        @apply mb-3 pt-4 text-2xl font-bold tracking-tight text-gray-900;
+      }
+
+      h4 {
+        @apply mb-4 pt-12 text-3xl font-semibold text-gray-900;
+      }
+
+      h5 {
+        @apply mb-3 pt-4 text-2xl font-bold tracking-tight text-gray-900;
+      }
+
+      h6 {
+        @apply mb-3 pt-4 text-xl font-bold tracking-tight text-gray-900;
+      }
+
+      p {
+        @apply mb-4 font-normal text-gray-900 leading-relaxed;
+      }
+    }
+
+    @layer components {
+      .list-select {
+        @apply block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0;
+      }
+
+      .tooltip {
+        position: absolute;
+        text-align: center;
+        padding: 8px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0;
+        border-radius: 8px;
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      .text-p {
+        @apply mb-4 font-normal text-gray-900 leading-relaxed;
+      }
+
+      .text-abstract {
+        @apply mb-4 font-normal text-gray-900 leading-relaxed text-justify;
+      }
+
+      .author {
+        @apply font-medium mr-2 pb-1 text-gray-900 inline-block text-base;
+      }
+
+      .author a {
+          @apply text-gray-900;
+        }
+
+      .affiliation {
+        @apply font-medium mr-2 pb-1 text-gray-900 block text-base;
+      }
+    }
+  </style>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {}
+        }
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <div id="app">
+
+    <nav class="bg-white fixed w-full z-20 top-0 start-0 border-gray-200 border-b border-gray-200"
+      style="font-weight: bold;">
+      <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-3">
+        <button data-collapse-toggle="navbar-default" type="button"
+          class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+          aria-controls="navbar-default" aria-expanded="false">
+          <span class="sr-only">Open main menu</span>
+          <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M1 1h15M1 7h15M1 13h15" />
+          </svg>
+        </button>
+
+        <div class="hidden w-full md:block md:w-auto ml-auto" id="navbar-default">
+          <ul
+            class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white">
+            <li>
+              <a href="#home" class="list-select"><b>Home</b></a>
+            </li>
+            <li>
+              <a href="#data" class="list-select"><b>VoxPrivacy-Task</b></a>
+            </li>
+            <li>
+              <a href="#eval" class="list-select"><b>VoxPrivacy-Data</b></a>
+            </li>
+            <li>
+              <a href="#model" class="list-select"><b>VoxPrivacy-Eval</b></a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
+    <div class="p-4 mt-24 max-w-screen-xl mx-auto" id="home">
+      <div class="mt-16 mb-8">
+        <h1>VoxPrivacy: A Benchmark for Evaluating Interactional Privacy of Speech Language Models</h1>
+        
+        <!-- Hugging Face Badge -->
+        <div class="flex justify-center mt-4">
+          <a href="https://huggingface.co/datasets/ICLR-data/VoxPrivacy" 
+             target="_blank" 
+             class="inline-flex items-center px-6 py-3 bg-yellow-50 hover:bg-yellow-100 text-white font-semibold rounded-xl transition-colors duration-200 shadow-md border-2 border-yellow-200 hover:border-yellow-300 group">
+            <img src="./huggingface-color.png" alt="Hugging Face" class="w-6 h-6 mr-3">
+            <span class="bg-gradient-to-r from-yellow-600 to-orange-500 bg-clip-text text-transparent group-hover:from-yellow-700 group-hover:to-orange-600 transition-all duration-200">Part of Benchmark Set</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="max-w-screen-xl mx-auto mt-8 mb-16">
+        <div class="text-center h-2 flex flex-col gap-3">
+        </div>
+
+        <div class="max-w-[900px] mx-auto mt-8 mb-16">
+          <h2 class="text-center">Abstract</h2>
+          <p class="text-abstract">
+            As Speech Language Models (SLMs) transition from personal devices to shared, multi-user environments such as smart homes, a new challenge emerges: the model is expected to distinguish between users to manage information flow appropriately. Without this capability, an SLM could reveal one user's confidential schedule to another—a privacy failure we term <strong>interactional privacy</strong>. Thus, the ability to generate speaker-aware responses becomes essential for SLM safe deployment. Current SLM evaluations test dialogue ability but overlook speaker identity. Multi-speaker benchmarks check who said what without assessing whether SLMs adapt their responses. Privacy benchmarks focus on globally sensitive data (e.g., bank passwords) while neglecting contextually sensitive information (e.g., a user's private appointment). To address this gap, we introduce <strong>VoxPrivacy</strong>, the first benchmark designed to evaluate interactional privacy in SLMs. VoxPrivacy spans three tiers of increasing difficulty, from following direct secrecy commands to proactively protecting privacy. Our evaluation of nine SLMs on a 32-hour bilingual dataset reveals a widespread vulnerability: most models perform near random chance, about 50% accuracy on binary privacy decisions. Our analysis shows these failures stem from a specific inability to handle conversational context, not a general failure to converse. We also demonstrate a viable path forward: by fine-tuning on a new 4,000-hour training set, we improve the model's privacy-preserving capabilities while achieving fair robustness. To support future work, we are releasing the VoxPrivacy benchmark, the large-scale training set, and the fine-tuned model to help the development of safer and more context-aware SLMs.
+
+        </div>
+
+
+        <div class="mt-8 mb-8" id="data">
+          <h4 class="text-center">VoxPrivacy-Task</h4>
+          
+          <!-- Task Overview Image -->
+          <div class="flex justify-center mb-8 mt-8">
+            <img src="./bigpic.jpg" alt="VoxPrivacy Task Overview" class="w-full max-w-6xl rounded-lg">
+          </div>
+          
+          <!-- Tier 1 -->
+          <h5 class="text-left">Tier 1: Direct Command Secrecy</h5>
+          <p class="text-p mb-4">
+            This task tests the model's obedience to an explicit command (e.g., <em>"Do not share this with anyone."</em>). The model is expected to uphold this command absolutely, refusing to disclose the information to any subsequent querier, regardless of their identity.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="flex flex-col items-center">
+              <video controls class="w-full max-w-md rounded-lg shadow-lg">
+                <source src="./demo/GIND_en.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <p class="mt-2 text-sm text-gray-600">English</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <video controls class="w-full max-w-md rounded-lg shadow-lg">
+                <source src="./demo/GIND_zh.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <p class="mt-2 text-sm text-gray-600">中文</p>
+            </div>
+          </div>
+
+          <!-- Tier 2 -->
+          <h5 class="text-left">Tier 2: Speaker-Verified Secrecy</h5>
+          <p class="text-p mb-4">
+            This task introduces speaker verification as a condition for disclosure. Given a more nuanced instruction like <em>"Let's keep this between us"</em>, the model must leverage the querier's voice as a biometric key, granting access exclusively to the original speaker while denying all others.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="flex flex-col items-center">
+              <video controls class="w-full max-w-md rounded-lg shadow-lg">
+                <source src="./demo/SVDD_en.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <p class="mt-2 text-sm text-gray-600">English</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <video controls class="w-full max-w-md rounded-lg shadow-lg">
+                <source src="./demo/SVDD_zh.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <p class="mt-2 text-sm text-gray-600">中文</p>
+            </div>
+          </div>
+
+          <!-- Tier 3 -->
+          <h5 class="text-left">Tier 3: Proactive Privacy Protection</h5>
+          <p class="text-p mb-4">
+            The most challenging task evaluates a model's ability to proactively protect user privacy, acting without any explicit instruction. It requires the model to use common-sense understanding to recognize when an utterance is inherently private (e.g., <em>"I'm worried about my upcoming medical results."</em>) based on its content. The model must then automatically enforce a speaker-conditioned access policy, disclosing the information only to the verified owner.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="flex flex-col items-center">
+              <video controls class="w-full max-w-md rounded-lg shadow-lg">
+                <source src="./demo/ASI_en.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <p class="mt-2 text-sm text-gray-600">English</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <video controls class="w-full max-w-md rounded-lg shadow-lg">
+                <source src="./demo/ASI_zh.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <p class="mt-2 text-sm text-gray-600">中文</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8" id="eval">
+          <h4 class="text-center">VoxPrivacy-Data</h4>
+          
+          <!-- Data Pipeline Image -->
+          <div class="flex justify-center mb-8 mt-8">
+            <div class="w-full max-w-6xl">
+              <img src="./data_pipeline.jpg" alt="VoxPrivacy Data Pipeline" class="w-full rounded-lg">
+              <p class="text-center text-sm text-gray-600 mt-2">Overview of the benchmark construction and evaluation.</p>
+            </div>
+          </div>
+
+          <!-- Dataset Overview Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-4xl mx-auto">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-100 p-6 rounded-xl shadow-md border border-blue-200">
+              <div class="text-center">
+                <div class="text-3xl font-bold text-indigo-700 mb-2">7,107</div>
+                <div class="text-sm font-medium text-indigo-600 mb-1">Total Utterances</div>
+                <div class="text-xs text-gray-600">Across all tasks and categories</div>
+              </div>
+            </div>
+            <div class="bg-gradient-to-br from-green-50 to-emerald-100 p-6 rounded-xl shadow-md border border-green-200">
+              <div class="text-center">
+                <div class="text-3xl font-bold text-emerald-700 mb-2">32.86</div>
+                <div class="text-sm font-medium text-emerald-600 mb-1">Hours of Audio</div>
+                <div class="text-xs text-gray-600">Bilingual dataset (EN/ZH)</div>
+              </div>
+            </div>
+            <div class="bg-gradient-to-br from-purple-50 to-violet-100 p-6 rounded-xl shadow-md border border-purple-200">
+              <div class="text-center">
+                <div class="text-3xl font-bold text-violet-700 mb-2">400</div>
+                <div class="text-sm font-medium text-violet-600 mb-1">Unique Speakers</div>
+                <div class="text-xs text-gray-600">200 EN + 200 ZH (1:1 gender)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Features -->
+          <div class="max-w-5xl mx-auto mb-8">
+            <h5 class="text-left mb-6">Key Dataset Features</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Quality Assurance -->
+              <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center mb-4">
+                  <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                  <h6 class="text-lg font-semibold text-gray-900">Quality Assurance</h6>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-2">
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Audio quality measured by DNSMOS
+                  </li>
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Speech intelligibility via Whisper WER
+                  </li>
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Human verification for coherence
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Diversity & Balance -->
+              <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center mb-4">
+                  <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <h6 class="text-lg font-semibold text-gray-900">Diversity & Balance</h6>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-2">
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    8 secret categories covering real-world scenarios
+                  </li>
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Balanced 1:1 English-Chinese ratio
+                  </li>
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Equal gender distribution (1:1 ratio)
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Multi-LLM Generation -->
+              <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center mb-4">
+                  <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                    <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                  <h6 class="text-lg font-semibold text-gray-900">Multi-LLM Generation</h6>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-2">
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Deepseek, Gemini, and ChatGPT collaboration
+                  </li>
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Mitigates single-model bias
+                  </li>
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-purple-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Ensures linguistic diversity
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Audio Synthesis -->
+              <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center mb-4">
+                  <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                    <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM15.657 6.343a1 1 0 011.414 0A9.972 9.972 0 0119 12a9.972 9.972 0 01-1.929 5.657 1 1 0 11-1.414-1.414A7.971 7.971 0 0017 12a7.971 7.971 0 00-1.343-4.243 1 1 0 010-1.414z" clip-rule="evenodd"/>
+                      <path fill-rule="evenodd" d="M13.243 8.757a1 1 0 011.414 0A5.98 5.98 0 0116 12a5.98 5.98 0 01-1.343 3.243 1 1 0 11-1.414-1.414A3.99 3.99 0 0014 12a3.99 3.99 0 00-.757-2.243 1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                  <h6 class="text-lg font-semibold text-gray-900">High-Fidelity Audio</h6>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-2">
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    CosyVoice2 TTS for natural speech
+                  </li>
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Distinct speaker characteristics
+                  </li>
+                  <li class="flex items-start">
+                    <span class="inline-block w-2 h-2 bg-orange-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    Quality thresholds enforced
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expandable Data Distribution Table -->
+          <div class="max-w-6xl mx-auto">
+            <div class="bg-gray-50 rounded-lg border border-gray-200">
+              <button onclick="toggleDataTable()" class="w-full p-4 text-left flex justify-between items-center hover:bg-gray-100 transition-colors duration-200">
+                <h5 class="font-semibold text-gray-800">Detailed Data Distribution</h5>
+                <svg id="table-arrow" class="w-5 h-5 text-gray-500 transform transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              
+              <div id="data-table" class="hidden border-t border-gray-200">
+                <div class="p-4">
+                  <p class="text-sm text-gray-600 mb-4">Breakdown by Task Tier and Secret Category (Hours / Utterance Count)</p>
+                  
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-xs border-collapse border border-gray-300">
+                      <thead>
+                        <tr class="bg-gray-100">
+                          <th class="border border-gray-300 px-2 py-2 text-left font-semibold">Task</th>
+                          <th class="border border-gray-300 px-2 py-2 text-center font-semibold">Personal Info</th>
+                          <th class="border border-gray-300 px-2 py-2 text-center font-semibold">Location Info</th>
+                          <th class="border border-gray-300 px-2 py-2 text-center font-semibold">Academic Background</th>
+                          <th class="border border-gray-300 px-2 py-2 text-center font-semibold">Interpersonal Secrets</th>
+                          <th class="border border-gray-300 px-2 py-2 text-center font-semibold">Professional Aspirations</th>
+                          <th class="border border-gray-300 px-2 py-2 text-center font-semibold">Belief Conditions</th>
+                          <th class="border border-gray-300 px-2 py-2 text-center font-semibold">Illicit Actions</th>
+                          <th class="border border-gray-300 px-2 py-2 text-center font-semibold">Transient Secrets</th>
+                          <th class="border border-gray-300 px-2 py-2 text-center font-semibold">Overall</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td class="border border-gray-300 px-2 py-2 font-medium">Tier 1</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.43h / 297</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.29h / 267</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.43h / 297</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.58h / 326</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.40h / 288</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.40h / 288</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.61h / 334</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.31h / 272</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center font-medium">11.45h / 2369</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                          <td class="border border-gray-300 px-2 py-2 font-medium">Tier 2</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.59h / 297</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.43h / 267</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.59h / 297</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.76h / 326</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.55h / 288</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.55h / 288</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.79h / 334</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.46h / 272</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center font-medium">12.72h / 2369</td>
+                        </tr>
+                        <tr>
+                          <td class="border border-gray-300 px-2 py-2 font-medium">Tier 3</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.08h / 297</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">0.99h / 267</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.08h / 297</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.20h / 326</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.06h / 288</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.06h / 288</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.22h / 334</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">1.00h / 272</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center font-medium">8.69h / 2369</td>
+                        </tr>
+                        <tr class="bg-blue-50 font-medium">
+                          <td class="border border-gray-300 px-2 py-2 font-bold">Overall</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">4.10h / 891</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">3.71h / 801</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">4.10h / 891</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">4.54h / 864</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">4.01h / 864</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">4.01h / 864</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">4.62h / 1002</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center">3.76h / 816</td>
+                          <td class="border border-gray-300 px-2 py-2 text-center font-bold">32.86h / 7107</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <div class="mt-4 text-xs text-gray-500">
+                    <p>• Values represent combined totals for both Chinese and English data (1:1 ratio)</p>
+                    <p>• Each secret category contains balanced samples across different privacy contexts</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-8" id="model">
+          <h4 class="text-center">VoxPrivacy-Eval</h4>
+
+          <!-- Key Findings Overview -->
+          <div class="max-w-6xl mx-auto mt-8 mb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              
+              <!-- Finding 1: Performance Gap -->
+              <div class="bg-white border border-red-200 rounded-xl p-6 shadow-sm h-full flex flex-col">
+                <div class="flex items-center mb-4">
+                  <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                  <h6 class="text-lg font-semibold text-gray-900">Critical Gap</h6>
+                </div>
+                <p class="text-sm text-gray-600 mb-3 flex-grow">Most open-source SLMs perform at <strong class="text-red-600">~50% accuracy</strong> on privacy tasks</p>
+                <div class="bg-red-50 p-3 rounded-lg mt-auto">
+                  <p class="text-xs text-red-700 font-medium">⚠️ No better than random guessing</p>
+                </div>
+              </div>
+
+              <!-- Finding 2: Multilingual Challenge -->
+              <div class="bg-white border border-orange-200 rounded-xl p-6 shadow-sm h-full flex flex-col">
+                <div class="flex items-center mb-4">
+                  <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                    <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.578a18.87 18.87 0 01-1.724 4.78c.29.354.596.696.914 1.026a1 1 0 11-1.44 1.389c-.188-.196-.373-.396-.554-.6a19.098 19.098 0 01-3.107 3.567 1 1 0 01-1.334-1.49 17.087 17.087 0 003.13-3.733 18.992 18.992 0 01-1.487-2.494 1 1 0 111.79-.89c.234.47.489.928.764 1.372.417-.934.752-1.913.997-2.927H3a1 1 0 110-2h3V3a1 1 0 011-1zm6 6a1 1 0 01.894.553l2.991 5.982a.869.869 0 01.02.037l.99 1.98a1 1 0 11-1.79.895L15.383 16h-4.764l-.724 1.447a1 1 0 11-1.788-.894l.99-1.98.019-.038 2.99-5.982A1 1 0 0113 8zm-1.382 6h2.764L13 12.236 11.618 14z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                  <h6 class="text-lg font-semibold text-gray-900">Language Gap</h6>
+                </div>
+                <p class="text-sm text-gray-600 mb-3 flex-grow">Significant <strong class="text-orange-600">EN vs ZH</strong> performance disparity</p>
+                <div class="bg-orange-50 p-3 rounded-lg mt-auto">
+                  <p class="text-xs text-orange-700 font-medium">🌐 Multilingual privacy remains challenging</p>
+                </div>
+              </div>
+
+              <!-- Finding 3: Our Solution -->
+              <div class="bg-white border border-green-200 rounded-xl p-6 shadow-sm h-full flex flex-col">
+                <div class="flex items-center mb-4">
+                  <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                  <h6 class="text-lg font-semibold text-gray-900">Our Breakthrough</h6>
+                </div>
+                <p class="text-sm text-gray-600 mb-3 flex-grow">Fine-tuned model achieves <strong class="text-green-600">80%+ accuracy</strong> across tasks</p>
+                <div class="bg-green-50 p-3 rounded-lg mt-auto">
+                  <p class="text-xs text-green-700 font-medium">✅ Competitive with closed-source models</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Performance Visualization -->
+          <div class="max-w-6xl mx-auto mb-12">
+            <h5 class="text-left mb-6">Performance Across Privacy Tiers</h5>
+            
+            <!-- Tier Comparison Chart -->
+            <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Tier 1 -->
+                <div class="text-center">
+                  <div class="mb-4">
+                    <h6 class="text-lg font-semibold text-blue-600 mb-2">Tier 1: Direct Command</h6>
+                    <p class="text-sm text-gray-600 mb-4">"Do not share this with anyone"</p>
+                  </div>
+                  
+                  <!-- Performance Bars -->
+                  <div class="space-y-3">
+                    <div class="text-left">
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-600">Closed-source</span>
+                        <span class="font-medium text-blue-600">~82%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: 82%"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-left">
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-600">Open-source</span>
+                        <span class="font-medium text-red-600">~35%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-red-500 h-2 rounded-full" style="width: 35%"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-left">
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-600">Ours (Fine-tuned)</span>
+                        <span class="font-medium text-green-600">~85%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: 85%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tier 2 -->
+                <div class="text-center">
+                  <div class="mb-4">
+                    <h6 class="text-lg font-semibold text-purple-600 mb-2">Tier 2: Speaker-Verified</h6>
+                    <p class="text-sm text-gray-600 mb-4">"Keep this between us"</p>
+                  </div>
+                  
+                  <!-- Performance Bars -->
+                  <div class="space-y-3">
+                    <div class="text-left">
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-600">Closed-source</span>
+                        <span class="font-medium text-blue-600">~72%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: 72%"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-left">
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-600">Open-source</span>
+                        <span class="font-medium text-red-600">~49%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-red-500 h-2 rounded-full" style="width: 49%"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-left">
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-600">Ours (Fine-tuned)</span>
+                        <span class="font-medium text-green-600">~82%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: 82%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tier 3 -->
+                <div class="text-center">
+                  <div class="mb-4">
+                    <h6 class="text-lg font-semibold text-orange-600 mb-2">Tier 3: Proactive Protection</h6>
+                    <p class="text-sm text-gray-600 mb-4">"I'm worried about my medical results"</p>
+                  </div>
+                  
+                  <!-- Performance Bars -->
+                  <div class="space-y-3">
+                    <div class="text-left">
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-600">Closed-source</span>
+                        <span class="font-medium text-blue-600">~65%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: 65%"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-left">
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-600">Open-source</span>
+                        <span class="font-medium text-red-600">~49%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-red-500 h-2 rounded-full" style="width: 49%"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-left">
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-600">Ours (Fine-tuned)</span>
+                        <span class="font-medium text-green-600">~78%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: 78%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Legend -->
+              <div class="mt-6 pt-4 border-t border-gray-200">
+                <div class="flex justify-center space-x-6 text-xs">
+                  <div class="flex items-center">
+                    <div class="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                    <span class="text-gray-600">Closed-source (Gemini)</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-3 h-3 bg-red-500 rounded mr-2"></div>
+                    <span class="text-gray-600">Open-source (Average)</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                    <span class="text-gray-600">Our Fine-tuned Model</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Insights -->
+          <div class="max-w-4xl mx-auto mb-8">
+            <h5 class="text-left mb-6">Key Insights</h5>
+            <div class="space-y-4">
+              
+              <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                <div class="flex items-center">
+                  <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                  </svg>
+                  <p class="text-sm text-blue-800"><strong>Speaker-aware reasoning</strong> is an advanced capability that most open-source SLMs fundamentally lack.</p>
+                </div>
+              </div>
+
+              <div class="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg">
+                <div class="flex items-center">
+                  <svg class="w-5 h-5 text-orange-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                  </svg>
+                  <p class="text-sm text-orange-800">The shift from <strong>following commands</strong> (Tier 2) to <strong>making social judgments</strong> (Tier 3) is a critical failure point.</p>
+                </div>
+              </div>
+
+              <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                <div class="flex items-center">
+                  <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                  </svg>
+                  <p class="text-sm text-green-800"><strong>Fine-tuning</strong> demonstrates a viable path forward, achieving competitive performance with closed-source models.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier 1 Section -->
+          <div class="max-w-6xl mx-auto mt-12">
+            <div class="bg-gray-50 rounded-lg border border-gray-200">
+              <button onclick="toggleTier1Table()" class="w-full p-4 text-left flex justify-between items-center hover:bg-gray-100 transition-colors duration-200">
+                <h5 class="font-semibold text-gray-800">Tier 1: Direct Command Secrecy - Detailed Results</h5>
+                <svg id="tier1-arrow" class="w-5 h-5 text-gray-500 transform transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              
+              <div id="tier1-table" class="hidden border-t border-gray-200">
+                <div class="p-4">
+                  <p class="text-sm text-gray-600 mb-4">Performance on Tier 1. The LLM (Upper Bound) is achieved by using the text-only mode of Gemini-2.0-flash with perfect speaker information provided through explicit ID tags in the prompt. IRR (Invalid Response Rate) assesses conversational reliability, while Accuracy evaluates adherence to the non-disclosure command.</p>
+                  
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-xs border-collapse border border-gray-300">
+              <thead>
+                <tr class="bg-gray-100">
+                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold"></th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold" colspan="4">EN</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold" colspan="4">ZH</th>
+                </tr>
+                <tr class="bg-gray-100">
+                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold"></th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">IRR↓</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold" colspan="3">Accuracy↑</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">IRR↓</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold" colspan="3">Accuracy↑</th>
+                </tr>
+                <tr class="bg-gray-100">
+                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">Models</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Deepseek-V3</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Deepseek-V3</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Gemini2.5-Pro</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Human†</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Deepseek-V3</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Deepseek-V3</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Gemini2.5-Pro</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Human†</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="bg-cyan-100">
+                  <td class="border border-gray-300 px-2 py-1 font-bold text-center" colspan="9"><strong>Tier 1</strong></td>
+                </tr>
+                <tr class="bg-gray-100">
+                  <td class="border border-gray-300 px-2 py-1 font-italic text-center" colspan="9"><em>Upper Bound</em></td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">LLM</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.24</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">97.33</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">98.01</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">97.00</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.32</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">99.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">99.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">100.00</td>
+                </tr>
+                <tr class="bg-gray-100">
+                  <td class="border border-gray-300 px-2 py-1 font-italic text-center" colspan="9"><em>Closed-sourced</em></td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Gemini-2.0-flash</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.57</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">79.92</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">81.35</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">82.00</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.18</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">85.01</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">88.72</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">85.00</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Gemini-2.5-pro</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">0.15</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">81.42</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">81.95</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">-</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">0.56</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">83.90</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">84.03</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">-</td>
+                </tr>
+                <tr class="bg-gray-100">
+                  <td class="border border-gray-300 px-2 py-1 font-italic text-center" colspan="9"><em>Open-sourced</em></td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Qwen2.5Omni</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.93</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">41.42</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">39.41</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">37.00</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.90</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">31.59</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">30.50</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">29.50</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">MiniCPM-o2.6</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.67</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">26.86</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">30.06</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">-</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.44</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">22.28</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">23.77</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">-</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Qwen2Audio</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.04</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">27.47</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">30.02</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">32.25</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">4.36</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">25.88</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">25.88</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">29.50</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Voxtral3B</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.41</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">37.11</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">37.91</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">34.50</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">2.77</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">22.26</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">24.89</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">21.75</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Baichuan-Omni-1.5</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">7.31</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">39.81</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">39.00</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">42.25</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">7.78</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">31.50</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">31.50</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">33.75</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">GLM4Voice</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">2.13</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">44.91</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">43.88</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">42.50</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.88</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">25.81</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">26.03</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">26.00</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Kimi-Audio</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">2.40</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">73.04</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">71.38</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">64.75</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">16.42</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">38.26</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">40.77</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">35.25</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Ours: Kimi-Audio-sft</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">5.06</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">88.11</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">87.92</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">83.25</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">9.13</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">79.43</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">80.23</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">82.50</td>
+                </tr>
+              </tbody>
+            </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier 2&3 Section -->
+          <div class="max-w-6xl mx-auto mt-8">
+            <div class="bg-gray-50 rounded-lg border border-gray-200">
+              <button onclick="toggleTier23Table()" class="w-full p-4 text-left flex justify-between items-center hover:bg-gray-100 transition-colors duration-200">
+                <h5 class="font-semibold text-gray-800">Tier 2&3: Conditional Privacy Tasks - Detailed Results</h5>
+                <svg id="tier23-arrow" class="w-5 h-5 text-gray-500 transform transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              
+              <div id="tier23-table" class="hidden border-t border-gray-200">
+                <div class="p-4">
+                  <p class="text-sm text-gray-600 mb-4">Performance on Conditional Privacy Tasks: Speaker-Verified (Tier 2) and Proactive Privacy Protection (Tier 3).</p>
+                  
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-xs border-collapse border border-gray-300">
+              <thead>
+                <tr class="bg-gray-100">
+                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold"></th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold" colspan="5">EN</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold" colspan="5">ZH</th>
+                </tr>
+                <tr class="bg-gray-100">
+                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">Models</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">IRR↓</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Accuracy↑</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Precision↑</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Recall↑</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">F1↑</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">IRR↓</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Accuracy↑</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Precision↑</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">Recall↑</th>
+                  <th class="border border-gray-300 px-2 py-1 text-center font-semibold">F1↑</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Tier 2 Section -->
+                <tr class="bg-cyan-100">
+                  <td class="border border-gray-300 px-2 py-1 font-bold text-center" colspan="11"><strong>Tier 2</strong></td>
+                </tr>
+                <tr class="bg-gray-100">
+                  <td class="border border-gray-300 px-2 py-1 font-italic text-center" colspan="11"><em>Upper Bound</em></td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">LLM</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.26</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">88.37</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">87.24</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">94.31</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">90.64</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">93.72</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">93.88</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">93.39</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">93.64</td>
+                </tr>
+                <tr class="bg-gray-100">
+                  <td class="border border-gray-300 px-2 py-1 font-italic text-center" colspan="11"><em>Closed-sourced</em></td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Gemini-2.0-flash</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.76</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">66.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">66.60</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">63.38</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">64.95</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">2.46</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">67.34</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">81.76</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">43.29</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">56.61</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Gemini-2.5-pro</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.05</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">76.05</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">75.89</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">76.90</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">76.39</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">2.25</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">77.93</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">83.41</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">70.32</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">76.31</td>
+                </tr>
+                <tr class="bg-gray-100">
+                  <td class="border border-gray-300 px-2 py-1 font-italic text-center" colspan="11"><em>Open-sourced</em></td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Qwen2.5Omni</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">0.08</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.27</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.05</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">41.65</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">44.63</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">1.02</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.05</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">47.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">12.50</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">19.76</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">MiniCPM-o2.6</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.67</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.92</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.50</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">25.42</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">33.82</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">46.50</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">12.56</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">19.78</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Qwen2Audio</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.09</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.47</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.78</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">27.77</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">35.90</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">3.57</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.03</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.20</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">23.59</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">31.68</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Voxtral3B</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.42</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">47.22</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">31.59</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">37.85</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">3.23</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.47</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.52</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">20.25</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">28.57</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Baichuan-Omni-1.5</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">14.81</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.34</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">42.69</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">39.29</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">40.92</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">14.34</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">51.78</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">45.73</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">29.78</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">36.07</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">GLM4Voice</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">2.27</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.04</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">44.58</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">47.18</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.96</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.70</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.73</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">15.89</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">24.08</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Kimi-Audio</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">3.28</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.61</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.88</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">72.62</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">59.14</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">14.54</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.25</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">45.69</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">18.63</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">26.47</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Ours: Kimi-Audio-sft</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.85</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">83.93</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">85.11</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">80.32</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">82.65</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">4.13</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">79.34</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">80.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">76.96</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">78.50</td>
+                </tr>
+
+                <!-- Tier 3 Section -->
+                <tr class="bg-cyan-100">
+                  <td class="border border-gray-300 px-2 py-1 font-bold text-center" colspan="11"><strong>Tier 3</strong></td>
+                </tr>
+                <tr class="bg-gray-100">
+                  <td class="border border-gray-300 px-2 py-1 font-italic text-center" colspan="11"><em>Upper Bound</em></td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">LLM</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.21</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">85.21</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">84.38</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">89.17</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">86.71</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.57</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">87.80</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">87.92</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">88.40</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">88.16</td>
+                </tr>
+                <tr class="bg-gray-100">
+                  <td class="border border-gray-300 px-2 py-1 font-italic text-center" colspan="11"><em>Closed-sourced</em></td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Gemini-2.0-flash</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">0.17</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">55.47</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">55.56</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">57.88</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">56.69</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.36</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">65.93</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">66.40</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">39.07</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.19</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Gemini-2.5-pro</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.38</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">66.28</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">65.30</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">68.92</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">67.06</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.33</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">68.58</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">70.90</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">63.83</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">67.18</td>
+                </tr>
+                <tr class="bg-gray-100">
+                  <td class="border border-gray-300 px-2 py-1 font-italic text-center" colspan="11"><em>Open-sourced</em></td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Qwen2.5Omni</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.36</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.18</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.40</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">34.00</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">40.61</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">0.85</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.80</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">46.45</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">14.55</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">22.16</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">MiniCPM-o2.6</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.34</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.40</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">46.44</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">20.95</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">28.87</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">0.85</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.20</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">47.67</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">12.56</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">19.88</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Qwen2Audio</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.93</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.53</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.52</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">26.23</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">34.29</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">3.74</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">49.91</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.25</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">35.68</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">41.73</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Voxtral3B</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.59</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.43</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">47.79</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">32.99</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">39.04</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">3.83</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.40</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">52.94</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">14.21</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">22.41</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Baichuan-Omni-1.5</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">21.63</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">52.39</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">42.97</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">42.97</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">42.97</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">19.70</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">51.55</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">43.41</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">45.59</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">44.47</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">GLM4Voice</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">1.43</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.90</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">51.15</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">45.32</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">48.06</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">2.81</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.31</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.22</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">20.04</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">28.64</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Kimi-Audio</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">0.76</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.13</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.00</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">62.07</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">55.39</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">17.78</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">51.60</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">50.25</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">21.11</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">29.73</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 px-2 py-1">Ours: Kimi-Audio-sft</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">2.27</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">77.57</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">78.18</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">77.48</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">77.83</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">2.21</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">82.88</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">84.76</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center">62.10</td>
+                  <td class="border border-gray-300 px-2 py-1 text-center font-bold">71.68</td>
+                </tr>
+              </tbody>
+            </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue
+
+    createApp({
+      setup() {
+        const message = ref('Hello Vue 3!')
+
+        return {
+          message
+        }
+      }
+    }).mount('#app')
+
+    // Toggle data table visibility
+    function toggleDataTable() {
+      const table = document.getElementById('data-table');
+      const arrow = document.getElementById('table-arrow');
+      
+      if (table.classList.contains('hidden')) {
+        table.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        table.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Toggle Tier 1 table visibility
+    function toggleTier1Table() {
+      const table = document.getElementById('tier1-table');
+      const arrow = document.getElementById('tier1-arrow');
+      
+      if (table.classList.contains('hidden')) {
+        table.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        table.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Toggle Tier 2&3 table visibility
+    function toggleTier23Table() {
+      const table = document.getElementById('tier23-table');
+      const arrow = document.getElementById('tier23-arrow');
+      
+      if (table.classList.contains('hidden')) {
+        table.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        table.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+  </script>
+
+</body>
+
+</html>
